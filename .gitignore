@@ -1,3 +1,8 @@
+# Pycharm
+.idea
+
 # Data
 init_data/*
 
+# Logs
+*.log
