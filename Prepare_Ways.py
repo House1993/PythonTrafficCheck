@@ -3,11 +3,13 @@ __author__ = 'Fang'
 import json
 import os
 import datetime
+import utilities as util
 
 INIT_DATA_DIR = "init_data"
 NODE_DATA = "3p.json"
 WAY_DATA = "3w.json"
 INER_DATA_DIR = "Intermediate"
+LOG_FILE = "Logs/Prepare_ways.log"
 
 def get_nodes():
     os.chdir(INIT_DATA_DIR)
@@ -36,31 +38,29 @@ def get_ways():
             tmp_id = item[u"id"]
             nodes_list = list()
             for node_id in item[u"nodes"]:
-                tmp_lat = nodes_dict[node_id][u"lat"]
-                tmp_lon = nodes_dict[node_id][u"lon"]
-                nodes_list.append({ u"lat" : tmp_lat , u"lon" : tmp_lon})
-            ways_dict[tmp_id] = { u"highway" : item[u"tags"][u"highway"] , u"nodes" : nodes_list }
+                if nodes_dict.has_key(node_id):
+                    tmp_node = nodes_dict[node_id]
+                    tmp_lat = tmp_node[u"lat"]
+                    tmp_lon = tmp_node[u"lon"]
+                    nodes_list.append({ u"lat" : tmp_lat , u"lon" : tmp_lon})
+            if len(nodes_list) > 1:
+                ways_dict[tmp_id] = { u"highway" : item[u"tags"][u"highway"] , u"nodes" : nodes_list }
     return ways_dict
 
-def write_json(file_name, data_dict):
-    os.chdir(INER_DATA_DIR)
-    with open(file_name, "wb") as outFile:
-        json.dump(data_dict, outFile)
-    os.chdir('..')
 
 if __name__ == "__main__":
 
     s_time = datetime.datetime.now()
     nodes_dict = get_nodes()
-    with open('m_test.log', 'a') as log_file:
+    with open(LOG_FILE, 'a') as log_file:
         e_time = datetime.datetime.now()
         cost_time = e_time - s_time
         log = "nodes_dict create cost %s\n" % str(cost_time)
         log_file.write(log)
 
     s_time = datetime.datetime.now()
-    write_json("nodes_dict", nodes_dict)
-    with open('m_test.log', 'a') as log_file:
+    util.write_json("nodes_dict", INER_DATA_DIR, nodes_dict)
+    with open(LOG_FILE, 'a') as log_file:
         e_time = datetime.datetime.now()
         cost_time = e_time - s_time
         log = "nodes_dict.json save cost %s\n" % str(cost_time)
@@ -68,15 +68,15 @@ if __name__ == "__main__":
 
     s_time = datetime.datetime.now()
     ways_dict = get_ways()
-    with open('m_test.log', 'a') as log_file:
+    with open(LOG_FILE, 'a') as log_file:
         e_time = datetime.datetime.now()
         cost_time = e_time - s_time
         log = "ways_dict create cost %s\n" % str(cost_time)
         log_file.write(log)
 
     s_time = datetime.datetime.now()
-    write_json("ways_dict", ways_dict)
-    with open('m_test.log', 'a') as log_file:
+    util.write_json("ways_dict", INER_DATA_DIR, ways_dict)
+    with open(LOG_FILE, 'a') as log_file:
         e_time = datetime.datetime.now()
         cost_time = e_time - s_time
         log = "ways_dict.json save cost %s\n" % str(cost_time)

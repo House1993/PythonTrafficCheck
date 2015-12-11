@@ -3,6 +3,7 @@
 
 # Data
 init_data/*
+Intermediate/*
 
 # Logs
-*.log
+Logs/*
