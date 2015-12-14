@@ -50,7 +50,7 @@ def get_grids():
             tmp_lat = float(nodes[i][u"lat"])
             tmp_lon = float(nodes[i][u"lon"])
             tmp_loc = find_grid_id(tmp_lat, tmp_lon)
-            grids_dict[last_loc].append(gen_segment(unicode(last_lon) + u"_" + unicode(way_id) + u"_" + unicode(i - 1), last_lat, last_lon, tmp_lat, tmp_lon, highway))
+            grids_dict[last_loc].append(gen_segment(unicode(last_loc) + u"_" + unicode(way_id) + u"_" + unicode(i - 1), last_lat, last_lon, tmp_lat, tmp_lon, highway))
             if(tmp_loc != last_loc):
                 grids_dict[tmp_loc].append(gen_segment(unicode(tmp_loc) + u"_" + unicode(way_id) + u"_" + unicode(i - 1), last_lat, last_lon, tmp_lat, tmp_lon, highway))
             last_lat = tmp_lat
@@ -73,6 +73,8 @@ if __name__ == "__main__":
     num_lat = int(math.ceil((max_lat - min_lat) / STEP) + 0.1)
     num_lon = int(math.ceil((max_lon - min_lon) / STEP) + 0.1)
     num_grids = num_lat * num_lon
+    map_range = min_lat, max_lat, min_lon, max_lon, num_lat, num_lon, num_grids
+    util.write_json('map_info', INER_DATA_DIR, map_range)
     with open(LOG_FILE, 'a') as log_file:
         e_time = datetime.datetime.now()
         cost_time = e_time - s_time
