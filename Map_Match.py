@@ -4,12 +4,13 @@ __author__ = 'Neo'
 import os
 import math
 import datetime
-import utilities
+import utilities as util
 import unicodecsv
 
 INIT_DATA_DIR = "init_data"
 INER_DATA_DIR = "Intermediate"
 GRIDE_FILE = 'grids_dict'
+WAY_ID2NAME_FILE = 'ways_id2name'
 TEST_FOLDER = 'speed'
 LONGITUDE_POSITION_IN_CSV = 2
 LATITUDE_POSITION_IN_CSV = 3
@@ -28,6 +29,7 @@ class Map_Match:
     __num_lon = 0
     __num_grids = 0
     __grids = {}
+    __ways = {}
 
     # 输入是文件夹名称
     # 文件夹内每个文件是剪好的一条轨迹
@@ -41,72 +43,64 @@ class Map_Match:
     def __init__(self):
 
         s_time = datetime.datetime.now()
-        self.__get_range_of_map()
+        self.__min_lat, self.__max_lat, self.__min_lon, self.__max_lon, self.__num_lat, \
+        self.__num_lon, self.__num_grids = util.read_json('map_info', INER_DATA_DIR)
         e_time = datetime.datetime.now()
         cost_time = e_time - s_time
         log = "get_range_of_map cost %s\n" % str(cost_time)
-        utilities.write_log('matching.log', log)
+        util.write_log('matching.log', log)
 
         s_time = datetime.datetime.now()
-        self.__get_grids()
+        self.__grids = util.read_json(GRIDE_FILE, INER_DATA_DIR)
         e_time = datetime.datetime.now()
         cost_time = e_time - s_time
         log = "get_grids cost %s\n" % str(cost_time)
-        utilities.write_log('matching.log', log)
+        util.write_log('matching.log', log)
+
+        s_time = datetime.datetime.now()
+        self.__ways = util.read_json(WAY_ID2NAME_FILE, INER_DATA_DIR)
+        e_time = datetime.datetime.now()
+        cost_time = e_time - s_time
+        log = "get_grids cost %s\n" % str(cost_time)
+        util.write_log('matching.log', log)
 
     def __match_per_freight(self, file_name, folder_name):
         rows_list = []
         with open(INIT_DATA_DIR + "/" + folder_name + "/" + file_name) as input_csv:
             reader = unicodecsv.reader(input_csv)
             for row in reader:
-                point = self.__construct_point(float(row[LATITUDE_POSITION_IN_CSV]),
-                                               float(row[LONGITUDE_POSITION_IN_CSV]))
-                matched_segment, segment_type, distance = self.__match_point_naive(point)
-                row.extend([matched_segment, segment_type, distance])
+                matched_segment, segment_type, distance = \
+                self.__match_point_naive(float(row[LATITUDE_POSITION_IN_CSV]), float(row[LONGITUDE_POSITION_IN_CSV]))
+                matched_way_name = self.__ways[matched_segment.split("_")[1]]
+                row.extend([matched_way_name, matched_segment, segment_type, distance])
                 rows_list.append(row)
         with open(INER_DATA_DIR + "/" + folder_name + "/" + file_name, 'w') as output_csv:
             writer = unicodecsv.writer(output_csv)
             writer.writerows(rows_list)
 
-    def __construct_point(self, x, y):
-        point = dict()
-        point["x"] = x
-        point["y"] = y
-        return point
-
-    def __match_point_naive(self, point):
-        in_grid_id = self.__find_grid_id(point["x"], point["y"])
-        neighbor_grid = self.__find_neighbor(in_grid_id)
+    def __match_point_naive(self, lat, lon):
+        neighbor_grid = self.__find_neighbor(lat, lon)
         min_dist = MAXDIST
         min_route = None
         min_type = ''
         for grid_id in neighbor_grid:
             routes = self.__grids[str(grid_id)]
             for route in routes:
-                dist = self.__cal_point_route(point, route)
+                dist = self.__cal_point_route(lat, lon, route)
                 if dist < min_dist:
                     min_route = route.keys()[0]
                     min_type = route.values()[0]['highway']
                     min_dist = dist
         return min_route, min_type, min_dist
 
-    def __get_grids(self):
-        self.__grids = utilities.read_json(GRIDE_FILE, INER_DATA_DIR)
-
-    def __find_grid_id(self, x, y):
+    def __find_grid(self, x, y):
         loc_x = int((x - self.__min_lat) / STEP)
         if loc_x == self.__num_lat:
             loc_x -= 1
         loc_y = int((y - self.__min_lon) / STEP)
         if loc_y == self.__num_lon:
             loc_y -= 1
-        loc = loc_x * self.__num_lon + loc_y
-        return loc
-
-    def __get_range_of_map(self):
-        range_of_map = utilities.read_json('map_info', INER_DATA_DIR)
-        self.__min_lat, self.__max_lat, self.__min_lon, \
-        self.__max_lon, self.__num_lat, self.__num_lon, self.__num_grids = range_of_map
+        return loc_x, loc_y
 
     def __cal_probe_distance(self, s_lat, s_lon, e_lat, e_lon):
         s_lat = math.radians(s_lat)
@@ -120,49 +114,80 @@ class Map_Match:
         angle = 2 * math.asin(math.sqrt(first + second))
         return math.floor(RADIUS * angle + 0.5)
 
-    def __find_neighbor(self, grid_id):
-        right_up = self.__num_lon - 1
-        left_down = self.__num_lon * (self.__num_lat - 1)
-        right_down = self.__num_lon * self.__num_lat - 1
-        up = range(1, right_up)
-        down = range(left_down + 1, right_down)
-        left = range(self.__num_lon, left_down, self.__num_lon)
-        right = range(self.__num_lon + right_up, right_down, self.__num_lon)
-        if grid_id in up:
-            ret_id = self.__find_neighbor_up(grid_id)
-        elif grid_id in down:
-            ret_id = self.__find_neighbor_down(grid_id)
-        elif grid_id in left:
-            ret_id = self.__find_neighbor_left(grid_id)
-        elif grid_id in right:
-            ret_id = self.__find_neighbor_right(grid_id)
-        elif grid_id == 0:
-            ret_id = self.__find_neighbor_left_up(grid_id)
-        elif grid_id == left_down:
-            ret_id = self.__find_neighbor_left_down(grid_id)
-        elif grid_id == right_up:
-            ret_id = self.__find_neighbor_right_up(grid_id)
-        elif grid_id == right_down:
-            ret_id = self.__find_neighbor_right_down(grid_id)
+    def __find_neighbor(self, lat, lon):
+        loc_x, loc_y = self.__find_grid(lat, lon)
+        loc_id = loc_x * self.__num_lon + loc_y
+        coner_x = self.__min_lat + STEP * loc_x
+        coner_y = self.__min_lon + STEP * loc_y
+        tmp_x = lat - coner_x
+        tmp_y = lon - coner_y
+        ret = [loc_id]
+        # self
+        up = loc_id - self.__num_lon
+        down = loc_id + self.__num_lon
+        left = loc_id - 1
+        right = loc_id + 1
+        upleft = up - 1
+        upright = up + 1
+        downleft = down - 1
+        downright = down + 1
+        if tmp_x < STEP / 3:
+            # up
+            if loc_x != 0:
+                ret.append(up)
+            if tmp_y < STEP / 3:
+                # left up
+                if loc_y != 0:
+                    ret.append(left)
+                    if loc_x != 0:
+                        ret.append(upleft)
+            elif tmp_y > STEP / 3 * 2:
+                # right up
+                if loc_y != self.__num_lon - 1:
+                    ret.append(right)
+                    if loc_x != 0:
+                        ret.append(upright)
+        elif tmp_x < STEP / 3 * 2:
+            # mid
+            if tmp_y < STEP / 3:
+                # left
+                if loc_y != 0:
+                    ret.append(left)
+            elif tmp_y > STEP / 3 * 2:
+                # right
+                if loc_y != self.__num_lon - 1:
+                    ret.append(right)
         else:
-            ret_id = self.__find_neighbor_inside(grid_id)
-        return ret_id
+            # down
+            if loc_x != self.__num_lat - 1:
+                ret.append(down)
+            if tmp_y < STEP / 3:
+                # left down
+                if loc_y != 0:
+                    ret.append(left)
+                    if loc_x != self.__num_lat - 1:
+                        ret.append(downleft)
+            elif tmp_y > STEP / 3 * 2:
+                # right down
+                if loc_y != self.__num_lon - 1:
+                    ret.append(right)
+                    if loc_x != self.__num_lat - 1:
+                        ret.append(downright)
+        return ret
 
-    def __cal_point_route(self, point, segment):
+    def __cal_point_route(self, lat, lon, segment):
         s_x = float(segment.values()[0]["snode"][0])
         s_y = float(segment.values()[0]["snode"][1])
         e_x = float(segment.values()[0]["enode"][0])
         e_y = float(segment.values()[0]["enode"][1])
-        p_x, p_y = self.__get_project_point(point, s_x, s_y, e_x, e_y)
+        p_x, p_y = self.__get_project_point(lat, lon, s_x, s_y, e_x, e_y)
         if (p_x - s_x) * (p_x - e_x) < 1e-8 and (p_y - s_y) * (p_y - e_y) < 1e-8:
-            return self.__cal_probe_distance(point["x"], point["y"], p_x, p_y)
+            return self.__cal_probe_distance(lat, lon, p_x, p_y)
         else:
-            return min(self.__cal_probe_distance(point["x"], point["y"], s_x, s_y),
-                       self.__cal_probe_distance(point["x"], point["y"], e_x, e_y))
+            return min(self.__cal_probe_distance(lat, lon, s_x, s_y),
+                       self.__cal_probe_distance(lat, lon, e_x, e_y))
 
-    def __get_project_point(self, point, x1, y1, x2, y2):
-        x0 = point["x"]
-        y0 = point["y"]
+    def __get_project_point(self, x0, y0, x1, y1, x2, y2):
         fenzi = (x1-x0) * (x1-x2) + (y1-y0) * (y1-y2)
         fenmu = math.pow(x1-x2, 2) + math.pow(y1-y2, 2)
         if fenmu == 0.0:
@@ -172,100 +197,13 @@ class Map_Match:
         ret_y = y1 + temp * (y2-y1)
         return ret_x, ret_y
 
-    def __find_neighbor_left_up(self, grid_id):
-        ret_id = list()
-        ret_id.append(grid_id)
-        ret_id.append(1)
-        ret_id.append(self.__num_lon)
-        ret_id.append(self.__num_lon + 1)
-        return ret_id
-
-    def __find_neighbor_right_up(self, grid_id):
-        ret_id = list()
-        ret_id.append(grid_id)
-        ret_id.append(grid_id - 1)
-        ret_id.append(grid_id + self.__num_lon)
-        ret_id.append(grid_id + self.__num_lon - 1)
-        return ret_id
-
-    def __find_neighbor_left_down(self, grid_id):
-        ret_id = list()
-        ret_id.append(grid_id)
-        ret_id.append(grid_id - self.__num_lon)
-        ret_id.append(grid_id - self.__num_lon + 1)
-        ret_id.append(grid_id+1)
-        return ret_id
-
-    def __find_neighbor_right_down(self, grid_id):
-        ret_id = list()
-        ret_id.append(grid_id)
-        ret_id.append(grid_id - self.__num_lon - 1)
-        ret_id.append(grid_id - self.__num_lon)
-        ret_id.append(grid_id - 1)
-        return ret_id
-
-    def __find_neighbor_up(self, grid_id):
-        ret_id = list()
-        ret_id.append(grid_id - 1)
-        ret_id.append(grid_id)
-        ret_id.append(grid_id+1)
-        ret_id.append(grid_id + self.__num_lon - 1)
-        ret_id.append(grid_id + self.__num_lon)
-        ret_id.append(grid_id + self.__num_lon + 1)
-        return ret_id
-
-    def __find_neighbor_down(self, grid_id):
-        ret_id = list()
-        ret_id.append(grid_id - 1)
-        ret_id.append(grid_id)
-        ret_id.append(grid_id + 1)
-        ret_id.append(grid_id - self.__num_lon - 1)
-        ret_id.append(grid_id - self.__num_lon)
-        ret_id.append(grid_id - self.__num_lon + 1)
-        return ret_id
-
-    def __find_neighbor_left(self, grid_id):
-        ret_id = list()
-        ret_id.append(grid_id - self.__num_lon)
-        ret_id.append(grid_id)
-        ret_id.append(grid_id + self.__num_lon)
-        ret_id.append(grid_id - self.__num_lon + 1)
-        ret_id.append(grid_id + 1)
-        ret_id.append(grid_id + self.__num_lon + 1)
-        return ret_id
-
-    def __find_neighbor_right(self, grid_id):
-        ret_id = list()
-        ret_id.append(grid_id - self.__num_lon)
-        ret_id.append(grid_id)
-        ret_id.append(grid_id + self.__num_lon)
-        ret_id.append(grid_id - self.__num_lon - 1)
-        ret_id.append(grid_id - 1)
-        ret_id.append(grid_id + self.__num_lon - 1)
-        return ret_id
-
-    def __find_neighbor_inside(self, grid_id):
-        ret_id = list()
-        ret_id.append(grid_id - 1)
-        ret_id.append(grid_id)
-        ret_id.append(grid_id + 1)
-        ret_id.append(grid_id - self.__num_lon - 1)
-        ret_id.append(grid_id - self.__num_lon)
-        ret_id.append(grid_id - self.__num_lon + 1)
-        ret_id.append(grid_id + self.__num_lon - 1)
-        ret_id.append(grid_id + self.__num_lon)
-        ret_id.append(grid_id + self.__num_lon + 1)
-        return ret_id
-
 if __name__ == "__main__":
 
-    utilities.write_log('matching.log', '\n')
+    util.write_log('matching.log', '\n')
     map_matching = Map_Match()
     s_time = datetime.datetime.now()
     map_matching.match(TEST_FOLDER)
     e_time = datetime.datetime.now()
     cost_time = e_time - s_time
     log = "Map matching cost %s\n" % str(cost_time)
-    utilities.write_log('matching.log', log)
-
-    map_matching.match('B61962')
+    util.write_log('matching.log', log)

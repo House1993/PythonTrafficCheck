@@ -33,6 +33,7 @@ def get_ways():
     os.chdir("..")
     ways_list = ways_data[u"elements"]
     ways_dict = dict()
+    ways_id2name = dict()
     for item in ways_list:
         if (item[u"type"] == u"way") and (u"tags" in item) and (u"highway" in item[u"tags"]):
             tmp_id = item[u"id"]
@@ -45,7 +46,11 @@ def get_ways():
                     nodes_list.append({ u"lat" : tmp_lat , u"lon" : tmp_lon})
             if len(nodes_list) > 1:
                 ways_dict[tmp_id] = { u"highway" : item[u"tags"][u"highway"] , u"nodes" : nodes_list }
-    return ways_dict
+                tmp_name = u""
+                if u"name" in item[u"tags"]:
+                    tmp_name = item[u"tags"][u"name"]
+                ways_dict[tmp_id] = tmp_name
+    return ways_dict, ways_id2name
 
 
 if __name__ == "__main__":
@@ -67,7 +72,7 @@ if __name__ == "__main__":
         log_file.write(log)
 
     s_time = datetime.datetime.now()
-    ways_dict = get_ways()
+    ways_dict, ways_id2name = get_ways()
     with open(LOG_FILE, 'a') as log_file:
         e_time = datetime.datetime.now()
         cost_time = e_time - s_time
@@ -76,6 +81,7 @@ if __name__ == "__main__":
 
     s_time = datetime.datetime.now()
     util.write_json("ways_dict", INER_DATA_DIR, ways_dict)
+    util.write_json("ways_id2name", INER_DATA_DIR, ways_id2name)
     with open(LOG_FILE, 'a') as log_file:
         e_time = datetime.datetime.now()
         cost_time = e_time - s_time

@@ -3,6 +3,7 @@ __author__ = 'Tissue'
 import os
 import json
 import pickle
+import time
 
 INER_DATA_DIR = "Intermediate"
 LOG_DIR = "Logs"
@@ -38,3 +39,8 @@ def write_log(log_file_name, log_info):
     with open(log_file_name, 'a') as log:
         log.write(log_info)
     os.chdir('..')
+
+def str_time_to_second(str_time):
+    tup_time = time.strptime(str_time.split(".")[0], "%Y-%m-%d %H:%M:%S")
+    seconds = time.mktime(tup_time)
+    return seconds

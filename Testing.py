@@ -26,14 +26,11 @@ class Speed_Overload_Testing:
 
     def __init__(self):
         s_time = datetime.datetime.now()
-        self.__get_speed_limit()
+        self.__speed_limit = utilities.read_json('speed_limit', INIT_DATA_DIR)
         e_time = datetime.datetime.now()
         cost_time = e_time - s_time
         log = "get_speed_limit cost %s\n" % str(cost_time)
         utilities.write_log('matching.log', log)
-
-    def __get_speed_limit(self):
-        self.__speed_limit = utilities.read_json('speed_limit', INIT_DATA_DIR)
 
     def __cal_probe_distance(self, s_lat, s_lon, e_lat, e_lon):
         s_lat = math.radians(s_lat)
