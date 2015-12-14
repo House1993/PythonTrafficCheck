@@ -35,6 +35,6 @@ def write_pickle(file_name, data):
 
 def write_log(log_file_name, log_info):
     os.chidr(LOG_DIR)
-    with open(log_file_name, 'w') as log:
+    with open(log_file_name, 'a') as log:
         log.write(log_info)
     os.chdir('..')
