@@ -56,9 +56,9 @@ def convert(input_file, output_file):
 def convert_all(data_dir):
     os.chdir(data_dir)
     for file in glob.glob("*.csv"):
-        output_name = 'utf' + file
+        output_name = 'init_data/speed/utf' + file
         convert(file, output_name)
     os.chdir("..")
 
 if __name__ == "__main__":
-    convert_all("init_data/speed")
+    convert_all("init_data/speed_before")
