@@ -49,7 +49,7 @@ def get_ways():
                 tmp_name = u""
                 if u"name" in item[u"tags"]:
                     tmp_name = item[u"tags"][u"name"]
-                ways_dict[tmp_id] = tmp_name
+                ways_id2name[tmp_id] = tmp_name
     return ways_dict, ways_id2name
 
 
