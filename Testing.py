@@ -8,10 +8,9 @@ import unicodecsv
 
 INIT_DATA_DIR = "init_data"
 INER_DATA_DIR = "Intermediate"
-LONGITUDE_POSITION_IN_CSV = 2
-LATITUDE_POSITION_IN_CSV = 3
 TIME_POSITION_IN_CSV = 1
-ROAD_TYPE_POSITION_IN_CSV = 10
+ROAD_TYPE_POSITION_IN_CSV = -2
+MILEAGE_INFO = -5
 TEST_FOLDER = 'speed'
 
 RADIUS = 6371000
@@ -47,10 +46,10 @@ class Speed_Overload_Testing:
             row_former = reader_iter.next()
             row_later = reader_iter.next()
             former_time = util.str_time_to_second(row_former[TIME_POSITION_IN_CSV])
-            former_mileage = float(row_former[-5].split(":")[1].split("k")[0])
+            former_mileage = float(row_former[MILEAGE_INFO].split(":")[1].split("k")[0])
             former_type = row_former[ROAD_TYPE_POSITION_IN_CSV]
             later_time = util.str_time_to_second(row_later[TIME_POSITION_IN_CSV])
-            later_mileage = float(row_later[-5].split(":")[1].split("k")[0])
+            later_mileage = float(row_later[MILEAGE_INFO].split(":")[1].split("k")[0])
             # print time_later
             # print later_minite, former_minite, later_second, former_second
             # 做两个循环外变量,否则捕捉异常时会出错
@@ -72,7 +71,7 @@ class Speed_Overload_Testing:
                     time_former = time_later
                     row_later = reader_iter.next()
                     later_time = util.str_time_to_second(row_later[TIME_POSITION_IN_CSV])
-                    later_mileage = float(row_later[-5].split(":")[1].split("k")[0])
+                    later_mileage = float(row_later[MILEAGE_INFO].split(":")[1].split("k")[0])
                     distance_later = later_mileage - former_mileage
                     time_later = later_time - former_time
                     v_former = 0
