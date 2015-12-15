@@ -3,19 +3,25 @@ __author__ = 'Fang'
 import unicodecsv
 import os
 import utilities as util
+import datetime
 
-SPEED_FILE_ORI = "utfa.csv"
+SPEED_FILE_ORI = "B50656.csv"
 SPEED_DIR = "init_data/speed/"
 MILEAGE_INFO = -1
 TIME_POSITION_IN_CSV = 1
 THIRTY_MINUTES = 1800
 
 def Cut_Route(folder):
+    s_time = datetime.datetime.now()
     ori_list = []
-    with open(SPEED_FILE_ORI) as input_csv:
+    with open(SPEED_DIR + SPEED_FILE_ORI) as input_csv:
         reader = unicodecsv.reader(input_csv)
         for row in reader:
             ori_list.append(row)
+    e_time = datetime.datetime.now()
+    util.write_log("Cut.log", "load csv cost %d" % (e_time - s_time))
+
+    s_time = datetime.datetime.now()
     file_idx = 0
     length = len(ori_list)
     row_written = -1
@@ -37,6 +43,9 @@ def Cut_Route(folder):
                             writer = unicodecsv.writer(output_csv)
                             writer.writerows(ori_list[k])
                         k += 1
+                    e_time = datetime.datetime.now()
+                    util.write_log("Cut.log", "%d part is from %d to %d cost %d" % (file_idx, row_written, last_diff, e_time - s_time))
+                    s_time = datetime.datetime.now()
                     row_written = -1
                     file_idx += 1
         else:
@@ -55,6 +64,8 @@ def Cut_Route(folder):
                 writer = unicodecsv.writer(output_csv)
                 writer.writerows(ori_list[k])
             k += 1
+    e_time = datetime.datetime.now()
+    util.write_log("Cut.log", "%d part is from %d to %d cost %d" % (file_idx, row_written, last_diff, e_time - s_time))
 
 if __name__ == "__main__":
     folder = SPEED_DIR + SPEED_FILE_ORI.split(".")[0] + "/"
