@@ -16,7 +16,7 @@ LONGITUDE_POSITION_IN_CSV = 2
 LATITUDE_POSITION_IN_CSV = 3
 
 RADIUS = 6371000
-MAXDIST = 99999999
+MAXDIST = 1e20
 STEP = 0.02
 
 # Map_Match 只有一个match方法,输入为切割好的轨迹所在文件夹的名称
@@ -81,8 +81,8 @@ class Map_Match:
     def __match_point_naive(self, lat, lon):
         neighbor_grid = self.__find_neighbor(lat, lon)
         min_dist = MAXDIST
-        min_route = None
-        min_type = ''
+        min_route = "__"
+        min_type = 'unclassified'
         for grid_id in neighbor_grid:
             routes = self.__grids[str(grid_id)]
             for route in routes:
