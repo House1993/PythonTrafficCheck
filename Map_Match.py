@@ -11,7 +11,6 @@ INIT_DATA_DIR = "init_data"
 INER_DATA_DIR = "Intermediate"
 GRIDE_FILE = 'grids_dict'
 WAY_ID2NAME_FILE = 'ways_id2name'
-TEST_FOLDER = 'speed'
 LONGITUDE_POSITION_IN_CSV = 2
 LATITUDE_POSITION_IN_CSV = 3
 
@@ -37,6 +36,7 @@ class Map_Match:
     # 匹配完在每个csv文件每行末尾增加字段:路段名称,道路类型,匹配距离
     # 路段名称的格式是 分块id_道路id_分块内部序号,其中道路id与osm提供的id是一致的.
     def match(self, folder_name):
+        os.mkdir(INER_DATA_DIR + "/" + folder_name)
         for file in os.listdir(INIT_DATA_DIR + "/" + folder_name + "/"):
             self.__match_per_freight(file, folder_name)
 
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     util.write_log('matching.log', '\n')
     map_matching = Map_Match()
     s_time = datetime.datetime.now()
-    map_matching.match(TEST_FOLDER)
+    map_matching.match("speed/B50656")
     e_time = datetime.datetime.now()
     cost_time = e_time - s_time
     log = "Map matching cost %s\n" % str(cost_time)
