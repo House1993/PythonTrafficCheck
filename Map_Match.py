@@ -61,7 +61,7 @@ class Map_Match:
         self.__ways = util.read_json(WAY_ID2NAME_FILE, INER_DATA_DIR)
         e_time = datetime.datetime.now()
         cost_time = e_time - s_time
-        log = "get_grids cost %s\n" % str(cost_time)
+        log = "get_way_id_to_name cost %s\n" % str(cost_time)
         util.write_log('matching.log', log)
 
     def __match_per_freight(self, file_name, folder_name):
@@ -87,7 +87,10 @@ class Map_Match:
         min_route = None
         min_type = 'unclassified'
         for grid_id in neighbor_grid:
-            routes = self.__grids[str(grid_id)]
+            try:
+                routes = self.__grids[str(grid_id)]
+            except Exception:
+                continue
             for route in routes:
                 dist = self.__cal_point_route(lat, lon, route)
                 if dist < min_dist:
@@ -201,12 +204,10 @@ class Map_Match:
         return ret_x, ret_y
 
 if __name__ == "__main__":
-
-    util.write_log('matching.log', '\n')
-    map_matching = Map_Match()
     s_time = datetime.datetime.now()
+    map_matching = Map_Match()
     map_matching.match("speed/B50656")
     e_time = datetime.datetime.now()
     cost_time = e_time - s_time
-    log = "Map matching cost %s\n" % str(cost_time)
+    log = "Total cost %s\n" % str(cost_time)
     util.write_log('matching.log', log)
