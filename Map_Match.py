@@ -71,7 +71,10 @@ class Map_Match:
             for row in reader:
                 matched_segment, segment_type, distance = \
                 self.__match_point_naive(float(row[LATITUDE_POSITION_IN_CSV]), float(row[LONGITUDE_POSITION_IN_CSV]))
-                matched_way_name = self.__ways[matched_segment.split("_")[1]]
+                try:
+                    matched_way_name = self.__ways[matched_segment.split("_")[1]]
+                except Exception:
+                    matched_way_name = ""
                 row.extend([matched_way_name, matched_segment, segment_type, distance])
                 rows_list.append(row)
         with open(INER_DATA_DIR + "/" + folder_name + "/" + file_name, 'w') as output_csv:
@@ -81,7 +84,7 @@ class Map_Match:
     def __match_point_naive(self, lat, lon):
         neighbor_grid = self.__find_neighbor(lat, lon)
         min_dist = MAXDIST
-        min_route = "__"
+        min_route = None
         min_type = 'unclassified'
         for grid_id in neighbor_grid:
             routes = self.__grids[str(grid_id)]
