@@ -19,7 +19,7 @@ def Cut_Route(folder):
         for row in reader:
             ori_list.append(row)
     e_time = datetime.datetime.now()
-    util.write_log("Cut.log", "load csv cost %d" % (e_time - s_time))
+    util.write_log("Cut.log", "load csv cost %s" % str(e_time - s_time))
 
     s_time = datetime.datetime.now()
     file_idx = 0
@@ -44,7 +44,7 @@ def Cut_Route(folder):
                             writer.writerows(ori_list[k])
                         k += 1
                     e_time = datetime.datetime.now()
-                    util.write_log("Cut.log", "%d part is from %d to %d cost %d" % (file_idx, row_written, last_diff, e_time - s_time))
+                    util.write_log("Cut.log", "%d part is from %d to %d cost %s" % (file_idx, row_written, last_diff, str(e_time - s_time)))
                     s_time = datetime.datetime.now()
                     row_written = -1
                     file_idx += 1
@@ -65,7 +65,7 @@ def Cut_Route(folder):
                 writer.writerows(ori_list[k])
             k += 1
     e_time = datetime.datetime.now()
-    util.write_log("Cut.log", "%d part is from %d to %d cost %d" % (file_idx, row_written, last_diff, e_time - s_time))
+    util.write_log("Cut.log", "%d part is from %d to %d cost %s" % (file_idx, row_written, last_diff, str(e_time - s_time)))
 
 if __name__ == "__main__":
     folder = SPEED_DIR + SPEED_FILE_ORI.split(".")[0] + "/"
