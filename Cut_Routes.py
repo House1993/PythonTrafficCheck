@@ -39,9 +39,9 @@ def Cut_Route(folder):
                 if row_written != last_diff:
                     k = row_written
                     while k <= last_diff:
-                        with open(folder + str(file_idx) + ".csv", "a") as output_csv:
+                        with open(folder + str(file_idx) + ".csv", "ab") as output_csv:
                             writer = unicodecsv.writer(output_csv)
-                            writer.writerows(ori_list[k])
+                            writer.writerows([ori_list[k]])
                         k += 1
                     e_time = datetime.datetime.now()
                     util.write_log("Cut.log", "%d part is from %d to %d cost %s\n" % (file_idx, row_written, last_diff, str(e_time - s_time)))
