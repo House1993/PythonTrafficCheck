@@ -19,7 +19,7 @@ def Cut_Route(folder):
         for row in reader:
             ori_list.append(row)
     e_time = datetime.datetime.now()
-    util.write_log("Cut.log", "load csv cost %s" % str(e_time - s_time))
+    util.write_log("Cut.log", "load csv cost %s\n" % str(e_time - s_time))
 
     s_time = datetime.datetime.now()
     file_idx = 0
@@ -35,7 +35,7 @@ def Cut_Route(folder):
         mileage_j = float(ori_list[j][MILEAGE_INFO].split(":")[1].split("k")[0])
         time_j = util.str_time_to_second(ori_list[j][TIME_POSITION_IN_CSV])
         if mileage_i == mileage_j:
-            if time_j - last_time >= THIRTY_MINUTES:
+            if (row_written != -1) and (time_j - last_time >= THIRTY_MINUTES):
                 if row_written != last_diff:
                     k = row_written
                     while k <= last_diff:
@@ -44,7 +44,7 @@ def Cut_Route(folder):
                             writer.writerows(ori_list[k])
                         k += 1
                     e_time = datetime.datetime.now()
-                    util.write_log("Cut.log", "%d part is from %d to %d cost %s" % (file_idx, row_written, last_diff, str(e_time - s_time)))
+                    util.write_log("Cut.log", "%d part is from %d to %d cost %s\n" % (file_idx, row_written, last_diff, str(e_time - s_time)))
                     s_time = datetime.datetime.now()
                     row_written = -1
                     file_idx += 1
@@ -65,7 +65,7 @@ def Cut_Route(folder):
                 writer.writerows(ori_list[k])
             k += 1
     e_time = datetime.datetime.now()
-    util.write_log("Cut.log", "%d part is from %d to %d cost %s" % (file_idx, row_written, last_diff, str(e_time - s_time)))
+    util.write_log("Cut.log", "%d part is from %d to %d cost %s\n" % (file_idx, row_written, last_diff, str(e_time - s_time)))
 
 if __name__ == "__main__":
     folder = SPEED_DIR + SPEED_FILE_ORI.split(".")[0] + "/"
