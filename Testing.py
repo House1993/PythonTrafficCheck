@@ -38,7 +38,7 @@ class Speed_Overload_Testing:
     def __speed_test_per_freight(self, file_name, folder_name):
         os.mkdir(INER_DATA_DIR + "/" + folder_name)
         rows_list = []
-        with open(INER_DATA_DIR + "/" + folder_name + "/" + file_name) as input_csv:
+        with open(INER_DATA_DIR + "/" + folder_name + "_res/" + file_name) as input_csv:
             reader = unicodecsv.reader(input_csv)
             reader_iter = reader.__iter__()
             row_former = reader_iter.next()
