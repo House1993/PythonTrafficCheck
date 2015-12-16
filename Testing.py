@@ -86,7 +86,7 @@ class Speed_Overload_Testing:
                 is_overspeed = v_former > self.__speed_limit[former_type]
                 row_former.extend([v_former, is_overspeed])
                 rows_list.append(row_former)
-        with open(INER_DATA_DIR + "/" + folder_name + "_res/" + file_name, 'w') as output_csv:
+        with open(INER_DATA_DIR + "/" + SAVE_FOLDER + "/" + file_name, 'w') as output_csv:
             writer = unicodecsv.writer(output_csv)
             writer.writerows(rows_list)
 
