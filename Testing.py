@@ -57,7 +57,11 @@ class Speed_Overload_Testing:
             v_former = 0
             if time_later != 0:
                 v_former = distance_later * 1000 / time_later
-            is_overspeed = v_former > self.__speed_limit[former_type]
+            try:
+                is_overspeed = v_former > self.__speed_limit[former_type]
+            except KeyError:
+                former_type = u"unclassified"
+                is_overspeed = v_former > self.__speed_limit[former_type]
             row_former.extend([v_former, is_overspeed])
             rows_list.append(row_former)
             try:
@@ -76,14 +80,22 @@ class Speed_Overload_Testing:
                     v_former = 0
                     if time_later != 0:
                         v_former = (distance_former + distance_later) * 1000 / (time_former + time_later)
-                    is_overspeed = v_former > self.__speed_limit[former_type]
+                    try:
+                        is_overspeed = v_former > self.__speed_limit[former_type]
+                    except KeyError:
+                        former_type = u"unclassified"
+                        is_overspeed = v_former > self.__speed_limit[former_type]
                     row_former.extend([v_former, is_overspeed])
                     rows_list.append(row_former)
             except StopIteration:
                 v_former = 0
                 if time_former != 0:
                     v_former = distance_former * 1000 / time_former
-                is_overspeed = v_former > self.__speed_limit[former_type]
+                try:
+                    is_overspeed = v_former > self.__speed_limit[former_type]
+                except KeyError:
+                    former_type = u"unclassified"
+                    is_overspeed = v_former > self.__speed_limit[former_type]
                 row_former.extend([v_former, is_overspeed])
                 rows_list.append(row_former)
         with open(INER_DATA_DIR + "/" + SAVE_FOLDER + "/" + file_name, 'w') as output_csv:
