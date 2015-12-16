@@ -12,6 +12,7 @@ TIME_POSITION_IN_CSV = 1
 ROAD_TYPE_POSITION_IN_CSV = -2
 MILEAGE_INFO = -5
 TEST_FOLDER = 'speed/B50656'
+SAVE_FOLDER = 'speed_res/B50656'
 
 RADIUS = 6371000
 
@@ -36,9 +37,9 @@ class Speed_Overload_Testing:
             self.__speed_test_per_freight(file, folder_name)
 
     def __speed_test_per_freight(self, file_name, folder_name):
-        os.mkdir(INER_DATA_DIR + "/" + folder_name)
+        os.mkdir(INER_DATA_DIR + "/" + SAVE_FOLDER)
         rows_list = []
-        with open(INER_DATA_DIR + "/" + folder_name + "_res/" + file_name) as input_csv:
+        with open(INER_DATA_DIR + "/" + folder_name + "/" + file_name) as input_csv:
             reader = unicodecsv.reader(input_csv)
             reader_iter = reader.__iter__()
             row_former = reader_iter.next()
