@@ -60,14 +60,17 @@ def Cut_Route(folder):
     if row_written != -1:
         k = row_written
         while k < length:
-            with open(folder + str(file_idx) + ".csv", "a") as output_csv:
+            with open(folder + str(file_idx) + ".csv", "ab") as output_csv:
                 writer = unicodecsv.writer(output_csv)
-                writer.writerows(ori_list[k])
+                writer.writerows([ori_list[k]])
             k += 1
     e_time = datetime.datetime.now()
     util.write_log("Cut.log", "%d part is from %d to %d cost %s\n" % (file_idx, row_written, last_diff, str(e_time - s_time)))
 
 if __name__ == "__main__":
+    start_time = datetime.datetime.now()
     folder = SPEED_DIR + SPEED_FILE_ORI.split(".")[0] + "/"
     os.mkdir(folder)
     Cut_Route(folder)
+    end_time = datetime.datetime.now()
+    util.write_log("Cut.log", "total cost %s\n", str(end_time - start_time))
