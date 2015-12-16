@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-__author__ = 'Neo'
+__author__ = 'Neo & Fang'
 
 import os
 import math
