@@ -73,4 +73,4 @@ if __name__ == "__main__":
     os.mkdir(folder)
     Cut_Route(folder)
     end_time = datetime.datetime.now()
-    util.write_log("Cut.log", "total cost %s\n", str(end_time - start_time))
+    util.write_log("Cut.log", "total cost %s\n" % str(end_time - start_time))

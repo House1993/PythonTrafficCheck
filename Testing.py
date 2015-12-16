@@ -11,16 +11,13 @@ INER_DATA_DIR = "Intermediate"
 TIME_POSITION_IN_CSV = 1
 ROAD_TYPE_POSITION_IN_CSV = -2
 MILEAGE_INFO = -5
-TEST_FOLDER = 'speed'
+TEST_FOLDER = 'speed/B50656'
 
 RADIUS = 6371000
 
 class Speed_Overload_Testing:
     __average_speeds = {}
     __speed_limit = {}
-
-    def overload_test(self, folder):
-        self.speed_test(folder)
 
     def __init__(self):
         s_time = datetime.datetime.now()
@@ -92,9 +89,8 @@ class Speed_Overload_Testing:
             writer.writerows(rows_list)
 
 if __name__ == "__main__":
-    speed_test = Speed_Overload_Testing()
-    util.write_log('speed.log', '\n')
     s_time = datetime.datetime.now()
+    speed_test = Speed_Overload_Testing()
     speed_test.speed_test(TEST_FOLDER)
     e_time = datetime.datetime.now()
     cost_time = e_time - s_time
