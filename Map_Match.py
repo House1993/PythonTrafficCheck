@@ -38,6 +38,7 @@ class Map_Match:
     def match(self, folder_name):
         os.mkdir(INER_DATA_DIR + "/" + folder_name)
         for file in os.listdir(INIT_DATA_DIR + "/" + folder_name + "/"):
+            util.write_log('matching.log', "%s start:\n" % file)
             self.__match_per_freight(file, folder_name)
 
     def __init__(self):
@@ -69,11 +70,16 @@ class Map_Match:
         with open(INIT_DATA_DIR + "/" + folder_name + "/" + file_name) as input_csv:
             reader = unicodecsv.reader(input_csv)
             for row in reader:
-                matched_segment, segment_type, distance = \
-                self.__match_point_naive(float(row[LATITUDE_POSITION_IN_CSV]), float(row[LONGITUDE_POSITION_IN_CSV]))
+                try:
+                    matched_segment, segment_type, distance = \
+                    self.__match_point_naive(float(row[LATITUDE_POSITION_IN_CSV]), float(row[LONGITUDE_POSITION_IN_CSV]))
+                except Exception:
+                    util.write_log('matching.log', "position show ( %s , %s )\n" % (row[LATITUDE_POSITION_IN_CSV], row[LONGITUDE_POSITION_IN_CSV]))
+                    matched_segment, segment_type, distance = '', 'unclassified', MAXDIST
                 try:
                     matched_way_name = self.__ways[matched_segment.split("_")[1]]
                 except Exception:
+                    util.write_log('matching.log', "position ( %s , %s ) match segment %s\n" % (row[LATITUDE_POSITION_IN_CSV], row[LONGITUDE_POSITION_IN_CSV], matched_segment))
                     matched_way_name = ""
                 row.extend([matched_way_name, matched_segment, segment_type, distance])
                 rows_list.append(row)
@@ -84,12 +90,15 @@ class Map_Match:
     def __match_point_naive(self, lat, lon):
         neighbor_grid = self.__find_neighbor(lat, lon)
         min_dist = MAXDIST
-        min_route = None
+        min_route = ''
         min_type = 'unclassified'
         for grid_id in neighbor_grid:
             try:
                 routes = self.__grids[str(grid_id)]
             except Exception:
+                loc_x, loc_y = self.__find_grid(lat, lon)
+                loc_id = loc_x * self.__num_lon + loc_y
+                util.write_log('matching.log', "( %f , %f ) loc is ( %d , %d ) in grid %s found grid %s\n" % (lat, lon, loc_x, loc_y, str(loc_id), str(grid_id)))
                 continue
             for route in routes:
                 dist = self.__cal_point_route(lat, lon, route)

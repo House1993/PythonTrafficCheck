@@ -45,20 +45,3 @@ def str_time_to_second(str_time):
     tup_time = time.strptime(str_time.split(".")[0], "%Y-%m-%d %H:%M:%S")
     seconds = time.mktime(tup_time)
     return seconds
-
-def convert(input_file, output_file):
-    with open(input_file) as in_file:
-        lines = in_file.readlines()
-        with open(output_file,'w+') as out_file:
-            for line in lines:
-                out_file.writelines((line.decode('gb2312')).encode('utf_8'))
-
-def convert_all(data_dir):
-    os.chdir(data_dir)
-    for file in glob.glob("*.csv"):
-        output_name = 'utf' + file
-        convert(file, output_name)
-    os.chdir("..")
-
-if __name__ == "__main__":
-    convert_all("init_data/speed_before")
