@@ -25,7 +25,7 @@ class Speed_Overload_Testing:
         e_time = datetime.datetime.now()
         cost_time = e_time - s_time
         log = "get_speed_limit cost %s\n" % str(cost_time)
-        util.write_log('matching.log', log)
+        util.write_log('testing.log', log)
 
     def speed_test(self, folder_name):
         # 输入是文件夹名称
