@@ -33,11 +33,11 @@ class Speed_Overload_Testing:
         # 文件夹内每个文件是剪好的一条轨迹
         # 循环打开每个文件,对每个文件做轨迹匹配
         # 匹配完在每个csv文件每行末尾增加字段:seg_id,dis
+        os.mkdir(INER_DATA_DIR + "/" + SAVE_FOLDER)
         for file in os.listdir(INER_DATA_DIR + "/" + folder_name + "/"):
             self.__speed_test_per_freight(file, folder_name)
 
     def __speed_test_per_freight(self, file_name, folder_name):
-        os.mkdir(INER_DATA_DIR + "/" + SAVE_FOLDER)
         rows_list = []
         with open(INER_DATA_DIR + "/" + folder_name + "/" + file_name) as input_csv:
             reader = unicodecsv.reader(input_csv)
