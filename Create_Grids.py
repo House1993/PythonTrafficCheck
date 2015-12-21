@@ -7,7 +7,7 @@ import math
 WAY_DATA = "ways_dict"
 INER_DATA_DIR = "Intermediate"
 LOG_FILE = "Logs/Create_gids.log"
-STEP = 0.02
+STEP = 0.01
 
 def get_geo_range():
     min_lat = min_lon = 1000000

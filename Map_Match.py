@@ -16,7 +16,7 @@ LATITUDE_POSITION_IN_CSV = 3
 
 RADIUS = 6371000
 MAXDIST = 1e20
-STEP = 0.02
+STEP = 0.01
 
 # Map_Match 只有一个match方法,输入为切割好的轨迹所在文件夹的名称
 class Map_Match:
