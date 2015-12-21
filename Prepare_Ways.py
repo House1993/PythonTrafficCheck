@@ -63,13 +63,13 @@ if __name__ == "__main__":
         log = "nodes_dict create cost %s\n" % str(cost_time)
         log_file.write(log)
 
-    s_time = datetime.datetime.now()
-    util.write_json("nodes_dict", INER_DATA_DIR, nodes_dict)
-    with open(LOG_FILE, 'a') as log_file:
-        e_time = datetime.datetime.now()
-        cost_time = e_time - s_time
-        log = "nodes_dict.json save cost %s\n" % str(cost_time)
-        log_file.write(log)
+    # s_time = datetime.datetime.now()
+    # util.write_json("nodes_dict", INER_DATA_DIR, nodes_dict)
+    # with open(LOG_FILE, 'a') as log_file:
+    #     e_time = datetime.datetime.now()
+    #     cost_time = e_time - s_time
+    #     log = "nodes_dict.json save cost %s\n" % str(cost_time)
+    #     log_file.write(log)
 
     s_time = datetime.datetime.now()
     ways_dict, ways_id2name = get_ways()
