@@ -16,7 +16,7 @@ LATITUDE_POSITION_IN_CSV = 3
 
 RADIUS = 6371000
 MAXDIST = 1e20
-STEP = 0.015
+STEP = 0.01
 
 # Map_Match 只有一个match方法,输入为切割好的轨迹所在文件夹的名称
 class Map_Match:
@@ -146,43 +146,33 @@ class Map_Match:
         upright = up + 1
         downleft = down - 1
         downright = down + 1
-        if tmp_x < STEP / 3:
+        if tmp_x < STEP / 2:
             # up
             if loc_x != 0:
                 ret.append(up)
-            if tmp_y < STEP / 3:
+            if tmp_y < STEP / 2:
                 # left up
                 if loc_y != 0:
                     ret.append(left)
                     if loc_x != 0:
                         ret.append(upleft)
-            elif tmp_y > STEP / 3 * 2:
+            else:
                 # right up
                 if loc_y != self.__num_lon - 1:
                     ret.append(right)
                     if loc_x != 0:
                         ret.append(upright)
-        elif tmp_x < STEP / 3 * 2:
-            # mid
-            if tmp_y < STEP / 3:
-                # left
-                if loc_y != 0:
-                    ret.append(left)
-            elif tmp_y > STEP / 3 * 2:
-                # right
-                if loc_y != self.__num_lon - 1:
-                    ret.append(right)
         else:
             # down
             if loc_x != self.__num_lat - 1:
                 ret.append(down)
-            if tmp_y < STEP / 3:
+            if tmp_y < STEP / 2:
                 # left down
                 if loc_y != 0:
                     ret.append(left)
                     if loc_x != self.__num_lat - 1:
                         ret.append(downleft)
-            elif tmp_y > STEP / 3 * 2:
+            else:
                 # right down
                 if loc_y != self.__num_lon - 1:
                     ret.append(right)
