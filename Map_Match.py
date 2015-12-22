@@ -29,6 +29,7 @@ class Map_Match:
     __num_grids = 0
     __grids = {}
     __ways = {}
+    __row_for_log = 0
 
     # 输入是文件夹名称
     # 文件夹内每个文件是剪好的一条轨迹
@@ -38,6 +39,7 @@ class Map_Match:
     def match(self, folder_name):
         os.mkdir(INER_DATA_DIR + "/" + folder_name)
         for file in os.listdir(INIT_DATA_DIR + "/" + folder_name + "/"):
+            self.__row_for_log = 0
             util.write_log('matching.log', "%s start:\n" % file)
             self.__match_per_freight(file, folder_name)
 
@@ -70,6 +72,7 @@ class Map_Match:
         with open(INIT_DATA_DIR + "/" + folder_name + "/" + file_name) as input_csv:
             reader = unicodecsv.reader(input_csv)
             for row in reader:
+                self.__row_for_log += 1
                 try:
                     matched_segment, segment_type, distance = \
                     self.__match_point_naive(float(row[LATITUDE_POSITION_IN_CSV]), float(row[LONGITUDE_POSITION_IN_CSV]))
@@ -79,7 +82,7 @@ class Map_Match:
                 try:
                     matched_way_name = self.__ways[matched_segment.split("_")[1]]
                 except Exception:
-                    util.write_log('matching.log', "position ( %s , %s ) match segment %s\n" % (row[LATITUDE_POSITION_IN_CSV], row[LONGITUDE_POSITION_IN_CSV], matched_segment))
+                    util.write_log('matching.log', "row %d position ( %s , %s ) match segment %s\n" % (self.__row_for_log, row[LATITUDE_POSITION_IN_CSV], row[LONGITUDE_POSITION_IN_CSV], matched_segment))
                     matched_way_name = ""
                 row.extend([matched_way_name, matched_segment, segment_type, distance])
                 rows_list.append(row)
