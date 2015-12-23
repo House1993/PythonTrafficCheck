@@ -47,7 +47,8 @@ def extract_info(init_file):
         for row in reader:
             data_row = [util.str_time_to_second(row[TIME_POSITION_IN_CSV]), float(row[LATITUDE_POSITION_IN_CSV]),
                         float(row[LONGITUDE_POSITION_IN_CSV]),
-                        float(row[MILEAGE_POSITION_IN_CSV].split(u":")[1].split(u"k")[0])]
+                        float(row[MILEAGE_POSITION_IN_CSV].split(u":")[1].split(u"k")[0]),
+                        row[TIME_POSITION_IN_CSV]]
             data.append(data_row)
     return data
 
@@ -125,17 +126,28 @@ def get_project_point(x0, y0, x1, y1, x2, y2):
     return ret_x, ret_y
 
 
-def cal_probe_distance(s_lat, s_lon, e_lat, e_lon):
-    s_lat = math.radians(s_lat)
-    s_lon = math.radians(s_lon)
-    e_lat = math.radians(e_lat)
-    e_lon = math.radians(e_lon)
-    theta_lat = s_lat - e_lat
-    theta_long = s_lon - e_lon
-    first = pow(math.sin(theta_lat / 2.0), 2)
-    second = math.cos(s_lat) * math.cos(e_lat) * pow(math.sin(theta_long / 2.0), 2)
-    angle = 2 * math.asin(math.sqrt(first + second))
-    return math.floor(RADIUS * angle + 0.5)
+# def cal_probe_distance(s_lat, s_lon, e_lat, e_lon):
+#     s_lat = math.radians(s_lat)
+#     s_lon = math.radians(s_lon)
+#     e_lat = math.radians(e_lat)
+#     e_lon = math.radians(e_lon)
+#     theta_lat = s_lat - e_lat
+#     theta_long = s_lon - e_lon
+#     first = pow(math.sin(theta_lat / 2.0), 2)
+#     second = math.cos(s_lat) * math.cos(e_lat) * pow(math.sin(theta_long / 2.0), 2)
+#     angle = 2 * math.asin(math.sqrt(first + second))
+#     return math.floor(RADIUS * angle + 0.5)
+
+
+def oula_dis(s_lat, s_lon, e_lat, e_lon):
+    tmp_x = s_lat - e_lat
+    tmp_y = s_lon - e_lon
+    return math.sqrt(tmp_x * tmp_x + tmp_y * tmp_y)
+
+
+def cal_dis(s_lat, s_lon, e_lat, e_lon):
+    # return cal_probe_distance(s_lat, s_lon, e_lat, e_lon)
+    return oula_dis(s_lat, s_lon, e_lat, e_lon)
 
 
 def cal_point_route(lat, lon, segment):
@@ -145,9 +157,9 @@ def cal_point_route(lat, lon, segment):
     e_y = float(segment.values()[0][u"enode"][1])
     p_x, p_y = get_project_point(lat, lon, s_x, s_y, e_x, e_y)
     if (p_x - s_x) * (p_x - e_x) < 1e-8 and (p_y - s_y) * (p_y - e_y) < 1e-8:
-        return cal_probe_distance(lat, lon, p_x, p_y)
+        return cal_dis(lat, lon, p_x, p_y)
     else:
-        return min(cal_probe_distance(lat, lon, s_x, s_y),cal_probe_distance(lat, lon, e_x, e_y))
+        return min(cal_dis(lat, lon, s_x, s_y),cal_dis(lat, lon, e_x, e_y))
 
 
 def match_point_naive(lat, lon):
@@ -177,7 +189,6 @@ def match(start_line, end_line, rows):
             matched_way_name = Way_name[matched_segment.split(u"_")[1]]
         except Exception:
             matched_way_name = u""
-            # util.write_log(LOGS, "row %d pos ( %f , %f ) doesn't match\n" % (i, rows[i][LAT], rows[i][LON]))
         rows[i].extend([matched_way_name, matched_segment, segment_type, distance])
         i += 1
 
@@ -260,7 +271,6 @@ def solve():
             if mileage_i == mileage_j:
                 if (row_written != -1) and (time_j - last_time >= THIRTY_MINUTES):
                     if row_written != last_diff:
-                        # util.write_log(LOGS, "file %d from row %d to row %d\n" % (file_idx, row_written, last_diff))
                         match(row_written, last_diff, rows)
                         test_over_speed(row_written, last_diff, rows)
                         with open(str(file_idx) + ".csv", "wb") as output_csv:
@@ -278,7 +288,6 @@ def solve():
             mileage_i = mileage_j
             j += 1
         if (row_written != -1) and (row_written < length - 1):
-            # util.write_log(LOGS, "file %d from row %d to row %d\n" % (file_idx, row_written, length - 1))
             match(row_written, length - 1, rows)
             test_over_speed(row_written, length - 1, rows)
             with open(str(file_idx) + ".csv", "wb") as output_csv:
