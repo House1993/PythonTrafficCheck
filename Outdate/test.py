@@ -2,13 +2,12 @@
 __author__ = 'Neo'
 
 import os
-import sys
+
 import unicodecsv
-import overpass
-import pickle
 import matplotlib.pyplot as plt
 import numpy as np
-from utilities import read_json, write_json, write_pickle
+
+from Periodical.utilities import read_json, write_pickle
 from road_map import get_name_of_map
 
 DATA_DIR =  "Raw"

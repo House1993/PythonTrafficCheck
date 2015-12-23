@@ -3,7 +3,7 @@ __author__ = 'Neo'
 
 from collections import defaultdict
 
-from utilities import read_pickle, read_json
+from Periodical.utilities import read_pickle, read_json
 from road_map import get_tags_list
 
 

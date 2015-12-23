@@ -4,9 +4,11 @@
 # Data
 init_data/*
 Intermediate/*
+Result/*
 
 # Logs
 Logs/*
 
-# Outdate
+# Code
 Outdate/*
+Periodical/*

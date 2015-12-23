@@ -4,10 +4,11 @@ __author__ = 'Neo'
 from math import *
 from collections import defaultdict
 import os
+
 import numpy as np
 import unicodecsv
 
-from utilities import read_json, construct_point
+from Periodical.utilities import read_json, construct_point
 from osm_map import get_one_geo_range
 
 RADIUS = 6371000

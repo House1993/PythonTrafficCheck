@@ -6,8 +6,9 @@ __author__ = 'Neo'
 import os
 import pickle
 import datetime
-from utilities import write_json, read_json
 from collections import defaultdict
+
+from Periodical.utilities import write_json, read_json
 
 DATA_DIR = "Raw"
 TEMP_DIR = "Intermediate"
