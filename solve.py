@@ -175,7 +175,7 @@ def match(start_line, end_line, rows):
         matched_segment, segment_type, distance = match_point_naive(rows[i][LAT], rows[i][LON])
         try:
             matched_way_name = Way_name[matched_segment.split(u"_")[1]]
-        except KeyError:
+        except Exception:
             matched_way_name = u""
             # util.write_log(LOGS, "row %d pos ( %f , %f ) doesn't match\n" % (i, rows[i][LAT], rows[i][LON]))
         rows[i].extend([matched_way_name, matched_segment, segment_type, distance])
