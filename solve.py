@@ -36,7 +36,7 @@ def read_info():
     grids = util.read_json(GRIDS_DICT, INTER_DATA_DIR)
     way_name = util.read_json(WAY_ID2NAME, INTER_DATA_DIR)
     map_info = util.read_json(MAP_INFO, INTER_DATA_DIR)
-    speed_limit = util.read_json(INIT_DATA_DIR, SPEED_LIMIT)
+    speed_limit = util.read_json(SPEED_LIMIT, INIT_DATA_DIR)
     return grids, way_name, map_info, speed_limit
 
 
