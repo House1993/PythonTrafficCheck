@@ -5,6 +5,7 @@ import util
 import os
 import unicodecsv as ucsv
 import math
+import datetime
 
 
 INTER_DATA_DIR = "Intermediate"
@@ -28,6 +29,7 @@ MAX_NUM = 1e20
 THIRTY_MINUTES = 1800
 STEP = 0.01
 RADIUS = 6371000
+LOGS = "solve.log"
 
 
 def read_info():
@@ -175,6 +177,7 @@ def match(start_line, end_line, rows):
             matched_way_name = Way_name[matched_segment.split(u"_")[1]]
         except KeyError:
             matched_way_name = u""
+            util.write_log(LOGS, "row %d pos ( %f , %f ) doesn't match\n" % (i, rows[i][LAT], rows[i][LON]))
         rows[i].extend([matched_way_name, matched_segment, segment_type, distance])
 
 
@@ -233,6 +236,8 @@ def test_over_speed(start_line, end_line, rows):
 
 def solve():
     for init_file in os.listdir(FOLDER):
+        start_file = datetime.datetime.now()
+        util.write_log(LOGS, "%s start\n" % init_file)
         rows = extract_info(FOLDER + init_file)
         filename = init_file.split(".")[0]
         folder = RESULT + "/" + filename
@@ -277,9 +282,14 @@ def solve():
                 writer = ucsv.writer(output_csv)
                 writer.writerows(rows[row_written:])
         os.chdir("../..")
+        end_file = datetime.datetime.now()
+        util.write_log(LOGS, "%s finish , total costs %s\n" % (init_file, str(end_file - start_file)))
 
 
 if __name__ == "__main__":
+    start = datetime.datetime.now()
     Grids, Way_name, Map_info, Speed_limit = read_info()
     Min_lat, Max_lat, Min_lon, Max_lon, Num_lat, Num_lon, Num_grids = Map_info
+    end = datetime.datetime.now()
+    util.write_log(LOGS, "loading files costs %s\n" % str(end - start))
     solve()
