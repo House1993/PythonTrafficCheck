@@ -179,6 +179,7 @@ def match(start_line, end_line, rows):
             matched_way_name = u""
             util.write_log(LOGS, "row %d pos ( %f , %f ) doesn't match\n" % (i, rows[i][LAT], rows[i][LON]))
         rows[i].extend([matched_way_name, matched_segment, segment_type, distance])
+        i += 1
 
 
 def test_over_speed(start_line, end_line, rows):
@@ -259,6 +260,7 @@ def solve():
             if mileage_i == mileage_j:
                 if (row_written != -1) and (time_j - last_time >= THIRTY_MINUTES):
                     if row_written != last_diff:
+                        util.write_log(LOGS, "file %d from row %d to row %d\n" % (file_idx, row_written, last_diff))
                         match(row_written, last_diff, rows)
                         test_over_speed(row_written, last_diff, rows)
                         with open(str(file_idx) + ".csv", "wb") as output_csv:
@@ -276,6 +278,7 @@ def solve():
             mileage_i = mileage_j
             j += 1
         if (row_written != -1) and (row_written < length - 1):
+            util.write_log(LOGS, "file %d from row %d to row %d\n" % (file_idx, row_written, length - 1))
             match(row_written, length - 1, rows)
             test_over_speed(row_written, length - 1, rows)
             with open(str(file_idx) + ".csv", "wb") as output_csv:
