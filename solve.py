@@ -126,17 +126,17 @@ def get_project_point(x0, y0, x1, y1, x2, y2):
     return ret_x, ret_y
 
 
-# def cal_probe_distance(s_lat, s_lon, e_lat, e_lon):
-#     s_lat = math.radians(s_lat)
-#     s_lon = math.radians(s_lon)
-#     e_lat = math.radians(e_lat)
-#     e_lon = math.radians(e_lon)
-#     theta_lat = s_lat - e_lat
-#     theta_long = s_lon - e_lon
-#     first = pow(math.sin(theta_lat / 2.0), 2)
-#     second = math.cos(s_lat) * math.cos(e_lat) * pow(math.sin(theta_long / 2.0), 2)
-#     angle = 2 * math.asin(math.sqrt(first + second))
-#     return math.floor(RADIUS * angle + 0.5)
+def cal_probe_distance(s_lat, s_lon, e_lat, e_lon):
+    s_lat = math.radians(s_lat)
+    s_lon = math.radians(s_lon)
+    e_lat = math.radians(e_lat)
+    e_lon = math.radians(e_lon)
+    theta_lat = s_lat - e_lat
+    theta_long = s_lon - e_lon
+    first = pow(math.sin(theta_lat / 2.0), 2)
+    second = math.cos(s_lat) * math.cos(e_lat) * pow(math.sin(theta_long / 2.0), 2)
+    angle = 2 * math.asin(math.sqrt(first + second))
+    return math.floor(RADIUS * angle + 0.5)
 
 
 def oula_dis(s_lat, s_lon, e_lat, e_lon):
@@ -146,8 +146,8 @@ def oula_dis(s_lat, s_lon, e_lat, e_lon):
 
 
 def cal_dis(s_lat, s_lon, e_lat, e_lon):
-    # return cal_probe_distance(s_lat, s_lon, e_lat, e_lon)
-    return oula_dis(s_lat, s_lon, e_lat, e_lon)
+    return cal_probe_distance(s_lat, s_lon, e_lat, e_lon)
+    # return oula_dis(s_lat, s_lon, e_lat, e_lon)
 
 
 def cal_point_route(lat, lon, segment):
@@ -276,8 +276,8 @@ def solve():
                         with open(str(file_idx) + ".csv", "wb") as output_csv:
                             writer = ucsv.writer(output_csv)
                             writer.writerows(rows[row_written:last_diff + 1])
-                        row_written = -1
                         file_idx += 1
+                    row_written = -1
             else:
                 last_diff = i
                 last_time = time_i
